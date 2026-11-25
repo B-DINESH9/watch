@@ -2,6 +2,8 @@
 
 Interactive 3D scroll-storytelling web experience showcasing a hand-wound open-heart mechanical chronograph built with **Three.js** and **Vite**.
 
+**Live Demo (GitHub Pages):** https://b-dinesh9.github.io/watch/
+
 ## Features
 
 - **100% Procedural 3D Horology**: Multi-layer mechanical chronograph built dynamically in Three.js (`src/scene/watchBuilder.js`), featuring:
@@ -62,3 +64,7 @@ npm run build
 # Preview production build
 npm run preview
 ```
+
+## Deployment (GitHub Pages)
+
+Every push to `main` builds the Vite bundle (`dist/`) and deploys automatically via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) to **https://b-dinesh9.github.io/watch/**.
