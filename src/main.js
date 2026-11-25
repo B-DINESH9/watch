@@ -1,4 +1,3 @@
-import './styles/main.css';
 import { FINISH_PRESETS } from './scene/materials.js';
 import { StoryEngine } from './scene/storyEngine.js';
 
