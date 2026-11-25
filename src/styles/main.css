@@ -1,0 +1,1209 @@
+:root {
+  --background: #ebebeb;
+  --ink: #2c2c2c;
+  --ink-strong: #151515;
+  --soft: #777777;
+  --line: #cbcbcb;
+  --accent: #a7463d;
+  --edge: clamp(22px, 3.15vw, 64px);
+  --font-sans: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--background);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Preloader
+   ========================================================================== */
+#loading {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--background);
+  transition: opacity 0.65s ease, visibility 0.65s ease;
+}
+
+#loading.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.load-ring {
+  width: min(80vw, 88vh);
+  height: min(80vw, 88vh);
+  transform: rotate(-90deg);
+}
+
+.load-track {
+  fill: none;
+  stroke: #d7d7d7;
+  stroke-width: 0.55;
+}
+
+.load-arc {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.15;
+  stroke-linecap: round;
+  stroke-dasharray: 603.18;
+  stroke-dashoffset: 603.18;
+  animation: load-circle 1.15s cubic-bezier(0.22, 0.85, 0.36, 1) forwards;
+}
+
+@keyframes load-circle {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.load-center {
+  position: absolute;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--soft);
+}
+
+/* ==========================================================================
+   Fixed Canvases
+   ========================================================================== */
+#reference-backdrop,
+#watch-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  pointer-events: none;
+}
+
+#reference-backdrop {
+  z-index: 0;
+}
+
+#watch-canvas {
+  z-index: 1;
+}
+
+#reference-story {
+  position: relative;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Persistent Header & Progress Chrome
+   ========================================================================== */
+.reference-header {
+  position: fixed;
+  top: 26px;
+  left: var(--edge);
+  right: var(--edge);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0.72;
+  transition: opacity 0.3s ease, color 0.45s ease;
+}
+
+.reference-header:hover,
+.reference-header:focus-within {
+  opacity: 1;
+}
+
+.brand-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.header-script {
+  width: 64px;
+  height: 22px;
+  color: var(--ink-strong);
+  transition: color 0.45s ease;
+}
+
+.header-sub {
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.56;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.chrome-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  padding: 4px 2px;
+  transition: color 0.25s ease;
+}
+
+.chrome-btn:hover {
+  color: var(--accent);
+}
+
+.play-icon {
+  position: relative;
+  width: 8px;
+  height: 10px;
+  display: inline-block;
+}
+
+.play-icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 8px;
+  border-color: transparent transparent transparent currentColor;
+  transition: all 0.2s ease;
+}
+
+#reference-play[aria-pressed="true"] .play-icon::before {
+  border-width: 0 2.5px 0 2.5px;
+  border-color: currentColor;
+  width: 8px;
+  height: 10px;
+}
+
+.hamburger-icon {
+  position: relative;
+  width: 18px;
+  height: 8px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger-icon span {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transition: transform 0.28s ease;
+}
+
+#reference-menu[aria-expanded="true"] .hamburger-icon span:first-child {
+  transform: translateY(3.5px) rotate(45deg);
+}
+
+#reference-menu[aria-expanded="true"] .hamburger-icon span:last-child {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+/* Progress track & percentage */
+.progress-rail {
+  position: fixed;
+  top: 42%;
+  right: 16px;
+  width: 1px;
+  height: 16vh;
+  background: var(--line);
+  z-index: 30;
+  transition: background 0.45s ease;
+}
+
+#reference-progress {
+  width: 100%;
+  height: 100%;
+  background: #707070;
+  transform-origin: top center;
+  transform: scaleY(0);
+  transition: background 0.45s ease;
+}
+
+#reference-scroll-percent {
+  position: fixed;
+  right: 12px;
+  top: calc(42% + 16vh + 12px);
+  z-index: 30;
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: var(--soft);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.45s ease;
+}
+
+/* ==========================================================================
+   Index Navigation Overlay
+   ========================================================================== */
+#reference-navigation {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: rgba(235, 235, 235, 0.97);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  padding: 96px var(--edge) 64px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+#reference-navigation.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.nav-inner {
+  width: min(1160px, 100%);
+  margin: 0 auto;
+}
+
+.nav-kicker {
+  margin: 0 0 28px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--soft);
+}
+
+.nav-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 48px;
+}
+
+.nav-grid button {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 18px;
+  font-size: clamp(20px, 2.85vw, 44px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  color: var(--ink-strong);
+  transition: color 0.22s ease, transform 0.22s ease;
+}
+
+.nav-grid button:hover {
+  color: var(--accent);
+  transform: translateX(6px);
+}
+
+.nav-num {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Overlay System
+   ========================================================================== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.52s ease, visibility 0.52s ease;
+}
+
+.overlay-back {
+  z-index: 0;
+}
+
+.overlay.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==========================================================================
+   01 Intro & Manifesto
+   ========================================================================== */
+.hero-circle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(79vh, 51vw);
+  height: min(79vh, 51vw);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid #d1d1d1;
+  transition: opacity 0.35s ease;
+}
+
+.hero-wordmark-wrap {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: min(85vw, 1380px);
+  transform: translate(-50%, -50%);
+  color: #111111;
+}
+
+.hero-script {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.hero-manifesto {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 92vw;
+  transform: translate(-50%, 60vh);
+  text-align: center;
+  opacity: 0;
+  color: var(--ink-strong);
+}
+
+.manifesto-script {
+  width: clamp(190px, 24vw, 380px);
+  margin: 0 auto 12px;
+  display: block;
+}
+
+.manifesto-lines {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: clamp(46px, 12.2vw, 184px);
+  font-weight: 400;
+  letter-spacing: -0.075em;
+  line-height: 0.84;
+}
+
+.intro-corners {
+  position: absolute;
+  left: var(--edge);
+  right: var(--edge);
+  bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.intro-left-specs {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(22px, 3vw, 52px);
+}
+
+.spec-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.spec-label {
+  font-size: 11px;
+  color: var(--soft);
+}
+
+.spec-value-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-strong);
+}
+
+.color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f3f3f3 0%, #9b9ea3 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.14);
+}
+
+.model-kicker {
+  font-size: clamp(18px, 3.2vw, 44px);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  color: #a6a6a6;
+}
+
+.model-size {
+  font-size: clamp(20px, 2.2vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  color: var(--ink-strong);
+}
+
+.model-size small {
+  font-size: 0.45em;
+  letter-spacing: 0.04em;
+}
+
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: var(--soft);
+  letter-spacing: 0.02em;
+}
+
+.intro-right-tag {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  line-height: 1.45;
+  color: var(--soft);
+}
+
+/* ==========================================================================
+   02 Inside the watch (Disassembly)
+   ========================================================================== */
+.disassembly-watermark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 58vh;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  opacity: 0.065;
+  color: var(--ink-strong);
+}
+
+.section-kicker-top {
+  position: absolute;
+  top: 17%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+}
+
+.disassembly-pins {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.overlay.is-active .disassembly-pin {
+  pointer-events: auto;
+}
+
+.disassembly-pin {
+  position: absolute;
+  top: 83%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  color: rgba(0, 0, 0, 0.28);
+  transition: opacity 0.25s ease, color 0.25s ease, left 0.15s ease-out;
+}
+
+.disassembly-pin::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 1px;
+  height: 9.5vh;
+  background: rgba(0, 0, 0, 0.09);
+  transition: background 0.25s ease, height 0.25s ease;
+}
+
+.disassembly-pin:hover,
+.disassembly-pin.is-selected {
+  color: var(--accent);
+}
+
+.disassembly-pin:hover::before,
+.disassembly-pin.is-selected::before {
+  background: var(--accent);
+  height: 16vh;
+}
+
+.disassembly-pin.is-dimmed {
+  opacity: 0.35;
+}
+
+.component-detail {
+  position: absolute;
+  right: var(--edge);
+  top: 50%;
+  width: min(310px, 84vw);
+  transform: translateY(-50%) translateX(18px);
+  padding: 22px 24px;
+  background: rgba(242, 242, 242, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease;
+}
+
+.overlay.is-active .component-detail.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(-50%) translateX(0);
+}
+
+.detail-close {
+  float: right;
+  font-size: 11px;
+  color: var(--soft);
+}
+
+.detail-close:hover {
+  color: var(--ink-strong);
+}
+
+.detail-kicker {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.detail-title {
+  margin: 0 0 10px;
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  color: var(--ink-strong);
+}
+
+.detail-desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #4f4f4f;
+}
+
+/* Shared corner copy blocks */
+.micro-kicker {
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--soft);
+  margin-bottom: 6px;
+}
+
+.copy-lead {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-strong);
+}
+
+.copy-muted {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--soft);
+}
+
+.bottom-left-copy {
+  position: absolute;
+  left: var(--edge);
+  bottom: 36px;
+  max-width: 340px;
+}
+
+.bottom-right-copy {
+  position: absolute;
+  right: var(--edge);
+  bottom: 58px;
+  text-align: right;
+}
+
+.bottom-right-tag {
+  position: absolute;
+  right: var(--edge);
+  bottom: 58px;
+  font-size: 10px;
+  letter-spacing: 0.11em;
+  color: var(--soft);
+}
+
+/* ==========================================================================
+   03 Mechanical Heart (Dark Mode Stage)
+   ========================================================================== */
+body[data-section="Particles"] .reference-header,
+body[data-section="Particles"] .header-script {
+  color: #e8e8e8;
+}
+
+body[data-section="Particles"] .progress-rail {
+  background: #262626;
+}
+
+body[data-section="Particles"] #reference-progress {
+  background: #8e8e8e;
+}
+
+body[data-section="Particles"] #reference-scroll-percent {
+  color: #777777;
+}
+
+.heart-title {
+  position: absolute;
+  left: var(--edge);
+  top: 96px;
+}
+
+.heart-sub {
+  display: block;
+  font-size: clamp(28px, 5.2vw, 78px);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+  color: #727272;
+}
+
+.heart-main {
+  margin: 0;
+  font-size: clamp(58px, 11.2vw, 170px);
+  font-weight: 400;
+  letter-spacing: -0.075em;
+  line-height: 0.85;
+  color: #ececec;
+}
+
+.heart-copy .copy-lead {
+  color: #e8e8e8;
+}
+
+.heart-copy .copy-muted {
+  color: #878787;
+}
+
+.heart-metric {
+  position: absolute;
+  right: var(--edge);
+  bottom: 48px;
+  text-align: right;
+}
+
+.metric-num {
+  display: block;
+  font-size: clamp(42px, 9.4vw, 138px);
+  font-weight: 400;
+  letter-spacing: -0.07em;
+  line-height: 0.88;
+  color: #e6e6e6;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-unit {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: #787878;
+}
+
+/* ==========================================================================
+   04 Presentation (3 Stages)
+   ========================================================================== */
+.presentation-stage {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.48s ease;
+}
+
+body[data-presentation="0"] .stage-0,
+body[data-presentation="1"] .stage-1,
+body[data-presentation="2"] .stage-2 {
+  opacity: 1;
+}
+
+.pres-heading-center {
+  position: absolute;
+  top: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 92vw;
+}
+
+.pres-display {
+  margin: 4px 0 0;
+  font-size: clamp(34px, 6.4vw, 96px);
+  font-weight: 400;
+  letter-spacing: -0.07em;
+  line-height: 0.88;
+  color: var(--ink-strong);
+}
+
+.pres-heading-left {
+  position: absolute;
+  left: var(--edge);
+  top: 28%;
+  max-width: 36vw;
+}
+
+.pres-stack {
+  margin: 0 0 18px;
+  font-size: clamp(38px, 6.2vw, 92px);
+  font-weight: 400;
+  letter-spacing: -0.07em;
+  line-height: 0.9;
+  color: var(--ink-strong);
+}
+
+.pres-left-copy,
+.pres-copy {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #4f4f4f;
+  max-width: 340px;
+}
+
+/* ==========================================================================
+   05 The Bracelet
+   ========================================================================== */
+.straps-watermark {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  transform: translateX(-50%);
+  font-size: clamp(64px, 16vw, 240px);
+  font-weight: 400;
+  letter-spacing: -0.075em;
+  line-height: 0.85;
+  color: #dadada;
+  white-space: nowrap;
+}
+
+.bottom-right-specs {
+  position: absolute;
+  right: var(--edge);
+  bottom: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--soft);
+}
+
+/* ==========================================================================
+   06 In Perspective (Dual Live 3D Viewports)
+   ========================================================================== */
+.perspective-title {
+  position: absolute;
+  top: 84px;
+  left: var(--edge);
+  margin: 0;
+  font-size: clamp(30px, 4.4vw, 66px);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  color: var(--ink-strong);
+}
+
+.editorial-grid {
+  position: absolute;
+  left: var(--edge);
+  right: var(--edge);
+  top: 10%;
+  bottom: 4%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 3vw;
+}
+
+.editorial-figure {
+  margin: 0;
+  width: 45vw;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editorial-right {
+  align-self: flex-start;
+}
+
+.editorial-viewport {
+  width: 100%;
+  height: 76vh;
+  border: none;
+  background: transparent;
+}
+
+.editorial-figure figcaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-top: none;
+  padding: 4px 2vw 0;
+}
+
+.cap-title {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-strong);
+}
+
+/* ==========================================================================
+   07 Your Composition (Interactive Configurator)
+   ========================================================================== */
+.finish-number {
+  position: absolute;
+  left: 4%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(180px, 34vw, 480px);
+  font-weight: 400;
+  letter-spacing: -0.08em;
+  line-height: 0.8;
+  color: #dcdcdc;
+  font-variant-numeric: tabular-nums;
+}
+
+.configurator-panel {
+  position: absolute;
+  left: var(--edge);
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(460px, 88vw);
+  pointer-events: none;
+}
+
+.overlay.is-active .configurator-panel {
+  pointer-events: auto;
+}
+
+.config-heading {
+  margin: 4px 0 28px;
+  font-size: clamp(32px, 4.2vw, 60px);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  color: var(--ink-strong);
+}
+
+.config-group {
+  margin-bottom: 18px;
+}
+
+.group-label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--soft);
+  margin-bottom: 8px;
+}
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill-row button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
+  color: var(--ink);
+  transition: all 0.2s ease;
+}
+
+.pill-row button:hover {
+  border-color: var(--ink);
+}
+
+.pill-row button[aria-checked="true"] {
+  background: var(--ink-strong);
+  border-color: var(--ink-strong);
+  color: #f4f4f4;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.swatch-ink { background: #14161a; }
+.swatch-midnight { background: #162f59; }
+.swatch-silver { background: #cfd3d9; }
+.swatch-hw-silver { background: linear-gradient(135deg, #f2f4f7, #9fa4ab); }
+.swatch-hw-graphite { background: linear-gradient(135deg, #626873, #2b2f36); }
+.swatch-hw-champagne { background: linear-gradient(135deg, #f0dbb8, #b69462); }
+.swatch-br-silver { background: linear-gradient(135deg, #eef0f3, #adb2b8); }
+.swatch-br-dark { background: linear-gradient(135deg, #4b525e, #1d2128); }
+
+.config-output {
+  display: block;
+  margin-top: 22px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--soft);
+}
+
+/* ==========================================================================
+   08 Coming Together (Reassembly)
+   ========================================================================== */
+.parts-heading {
+  position: absolute;
+  left: var(--edge);
+  top: 86px;
+}
+
+.parts-display {
+  margin: 4px 0 0;
+  font-size: clamp(28px, 3.8vw, 56px);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 0.94;
+  color: var(--ink-strong);
+}
+
+.reassembly-progress {
+  position: absolute;
+  right: var(--edge);
+  bottom: 54px;
+  width: 190px;
+  text-align: right;
+}
+
+.reassembly-pct {
+  display: block;
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 8px;
+  color: var(--ink-strong);
+}
+
+.reassembly-meter {
+  width: 100%;
+  height: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.reassembly-meter-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--ink-strong);
+}
+
+/* ==========================================================================
+   09 A Closer Look (4-Watch Footer)
+   ========================================================================== */
+.footer-watermark {
+  position: absolute;
+  left: 50%;
+  top: 41%;
+  width: min(88vw, 1400px);
+  transform: translate(-50%, -50%);
+  opacity: 0.94;
+  color: #101010;
+}
+
+.footer-title {
+  position: absolute;
+  top: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: clamp(16px, 1.5vw, 22px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--ink-strong);
+}
+
+.footer-lineup {
+  position: absolute;
+  left: var(--edge);
+  right: var(--edge);
+  top: 14%;
+  bottom: 10%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5vw;
+  align-items: stretch;
+}
+
+.footer-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.footer-study {
+  width: 100%;
+  flex: 1 1 auto;
+}
+
+.overlay.is-active .footer-slot,
+.overlay.is-active .study-btn,
+.overlay.is-active .back-top-btn {
+  pointer-events: auto;
+}
+
+.study-btn {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 4px 10px;
+  border-top: none;
+  width: auto;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--ink-strong);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-slot:hover .study-btn,
+.footer-slot:focus-visible .study-btn {
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.footer-baseline {
+  position: absolute;
+  left: var(--edge);
+  right: var(--edge);
+  bottom: 24px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--soft);
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-script {
+  width: 48px;
+  height: 16px;
+  color: var(--ink-strong);
+}
+
+.back-top-btn {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-strong);
+  margin-right: 48px;
+}
+
+.back-top-btn:hover {
+  color: var(--accent);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 900px) {
+  .nav-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .editorial-grid {
+    flex-direction: column;
+    align-items: stretch;
+    top: 16%;
+    gap: 18px;
+  }
+
+  .editorial-figure {
+    width: 100%;
+  }
+
+  .editorial-viewport {
+    height: 28vh;
+  }
+
+  .configurator-panel {
+    top: auto;
+    bottom: 64px;
+    transform: none;
+  }
+
+  .bottom-right-copy {
+    display: none;
+  }
+
+  .footer-lineup {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .footer-center {
+    display: none;
+  }
+}

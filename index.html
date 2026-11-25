@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ebebeb" />
+    <title>Dinesh — Open Heart</title>
+  </head>
+  <body data-section="Intro" data-phase="0.00000" data-presentation="0">
+    <!-- Preloader -->
+    <div id="loading" role="status" aria-live="polite">
+      <svg class="load-ring" viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="load-track" cx="100" cy="100" r="96" />
+        <circle class="load-arc" cx="100" cy="100" r="96" />
+      </svg>
+      <div class="load-center">
+        <span id="load-status">Now loading</span>
+      </div>
+    </div>
+
+    <!-- Fixed 2D Studio/Dark Backdrop & 3D WebGL Canvas -->
+    <canvas id="reference-backdrop" aria-hidden="true"></canvas>
+    <canvas id="watch-canvas" data-engine="three.js" aria-label="Interactive 3D Open-Heart Watch"></canvas>
+
+    <!-- Reusable SVG Script Signature Symbol -->
+    <svg class="svg-defs" aria-hidden="true">
+      <defs>
+        <g id="dinesh-script-mark" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Capital D sweeping stem & curved bowl -->
+          <path d="M54 18 C46 56, 36 98, 28 128" stroke-width="11" />
+          <path d="M22 34 C68 4, 146 8, 152 58 C156 102, 86 128, 24 122" stroke-width="10.5" />
+          <!-- Flowing lowercase i-n-e-s-h -->
+          <path
+            d="M152 88 C164 78, 174 64, 178 52 C174 78, 176 104, 190 104 C202 104, 212 68, 224 62 C232 58, 232 98, 242 100 C252 102, 262 64, 276 62 C286 60, 284 98, 296 100 C312 98, 324 76, 316 64 C304 56, 296 94, 316 100 C334 96, 350 68, 342 62 C334 58, 354 90, 344 102 C336 108, 362 86, 376 56 C388 30, 396 12, 388 10 C378 10, 372 64, 374 102 C384 72, 398 60, 408 64 C416 68, 412 98, 422 100 C430 102, 438 92, 446 80"
+            stroke-width="9.2"
+          />
+          <!-- Dot above i -->
+          <circle cx="181" cy="34" r="5.5" fill="currentColor" stroke="none" />
+        </g>
+      </defs>
+    </svg>
+
+    <!-- Fixed Header Chrome -->
+    <header class="reference-header">
+      <a href="#section-intro" class="brand-home" data-jump="section-intro">
+        <svg class="header-script" viewBox="0 0 462 146" aria-label="Dinesh">
+          <use href="#dinesh-script-mark" />
+        </svg>
+        <span class="header-sub">OPEN HEART</span>
+      </a>
+      <nav class="header-actions" aria-label="Story controls">
+        <button id="reference-play" type="button" class="chrome-btn" aria-pressed="false">
+          <span class="play-icon" aria-hidden="true"></span>
+          <span class="play-label">Play</span>
+        </button>
+        <button id="reference-menu" type="button" class="chrome-btn" aria-expanded="false" aria-controls="reference-navigation">
+          <span class="menu-label">Index</span>
+          <span class="hamburger-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Fullscreen Index Navigation Overlay -->
+    <div id="reference-navigation" aria-hidden="true">
+      <div class="nav-inner">
+        <p class="nav-kicker">EXPLORE THE CALIBRE</p>
+        <ol class="nav-grid">
+          <li><button type="button" data-jump="section-intro"><span class="nav-num">01</span> Introduction</button></li>
+          <li><button type="button" data-jump="section-disassembly"><span class="nav-num">02</span> Inside the watch</button></li>
+          <li><button type="button" data-jump="section-particles"><span class="nav-num">03</span> Mechanical heart</button></li>
+          <li><button type="button" data-jump="section-presentation"><span class="nav-num">04</span> Every detail</button></li>
+          <li><button type="button" data-jump="section-straps"><span class="nav-num">05</span> The bracelet</button></li>
+          <li><button type="button" data-jump="section-images"><span class="nav-num">06</span> In perspective</button></li>
+          <li><button type="button" data-jump="section-colors"><span class="nav-num">07</span> Your composition</button></li>
+          <li><button type="button" data-jump="section-parts"><span class="nav-num">08</span> Coming together</button></li>
+          <li><button type="button" data-jump="section-footer"><span class="nav-num">09</span> A closer look</button></li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Scroll Progress Track & Readout -->
+    <div class="progress-rail" aria-hidden="true">
+      <div id="reference-progress"></div>
+    </div>
+    <div id="reference-scroll-percent" aria-hidden="true">0%</div>
+
+    <!-- =====================================================================
+         BACKDROP OVERLAYS (z-index: 0, behind the 3D watch canvas)
+         ===================================================================== -->
+    <section class="overlay overlay-back is-active" data-overlay="Intro" aria-hidden="false">
+      <div class="hero-circle" id="hero-circle"></div>
+      <div class="hero-wordmark-wrap" id="hero-wordmark">
+        <svg class="hero-script" viewBox="0 0 462 146" aria-hidden="true">
+          <use href="#dinesh-script-mark" />
+        </svg>
+      </div>
+      <div class="hero-manifesto" id="hero-manifesto" aria-hidden="true">
+        <svg class="manifesto-script" viewBox="0 0 462 146">
+          <use href="#dinesh-script-mark" />
+        </svg>
+        <div class="manifesto-lines">
+          <span>A</span>
+          <span>STUDY IN</span>
+          <span>PRECISION</span>
+          <span>EVERY</span>
+          <span>DETAIL</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="overlay overlay-back" data-overlay="Disassembly" aria-hidden="true">
+      <div class="disassembly-watermark" aria-hidden="true">
+        <svg viewBox="0 0 462 146">
+          <use href="#dinesh-script-mark" />
+        </svg>
+      </div>
+    </section>
+
+    <section class="overlay overlay-back" data-overlay="Straps" aria-hidden="true">
+      <div class="straps-watermark" aria-hidden="true">BRACELET</div>
+    </section>
+
+    <section class="overlay overlay-back" data-overlay="Colors" aria-hidden="true">
+      <div class="finish-number" id="finish-number" aria-hidden="true">01</div>
+    </section>
+
+    <section class="overlay overlay-back" data-overlay="Footer" aria-hidden="true">
+      <div class="footer-watermark" aria-hidden="true">
+        <svg viewBox="0 0 462 146">
+          <use href="#dinesh-script-mark" />
+        </svg>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         FOREGROUND OVERLAYS (z-index: 3, crisp HUD & interactive UI)
+         ===================================================================== -->
+    <!-- 01 Intro -->
+    <section class="overlay is-active" data-overlay="Intro" aria-hidden="false">
+      <div class="intro-corners" id="intro-corners">
+        <div class="intro-left-specs">
+          <div class="spec-block">
+            <span class="spec-label">Color</span>
+            <span class="spec-value-row">
+              <span class="color-dot" id="hero-color-dot"></span>
+              <span id="hero-color-name">Stainless steel</span>
+            </span>
+          </div>
+          <div class="spec-block spec-model">
+            <span class="model-kicker">MODEL</span>
+            <span class="model-size">39.7 <small>MM</small></span>
+          </div>
+        </div>
+        <div class="scroll-cue">↓ Scroll to discover</div>
+        <div class="intro-right-tag">
+          <span>DINESH</span>
+          <span>OPEN HEART</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 Disassembly -->
+    <section class="overlay" data-overlay="Disassembly" aria-hidden="true">
+      <div class="section-kicker-top">01 / THE ASSEMBLIES</div>
+
+      <div class="disassembly-pins" id="disassembly-pins">
+        <button type="button" class="disassembly-pin" data-layer="caseback"><span>Caseback</span></button>
+        <button type="button" class="disassembly-pin" data-layer="chronograph"><span>Chronograph</span></button>
+        <button type="button" class="disassembly-pin" data-layer="regulation"><span>Regulation</span></button>
+        <button type="button" class="disassembly-pin" data-layer="movement"><span>Movement</span></button>
+        <button type="button" class="disassembly-pin" data-layer="case"><span>Case</span></button>
+        <button type="button" class="disassembly-pin" data-layer="dial"><span>Dial &amp; hands</span></button>
+      </div>
+
+      <aside class="component-detail" id="component-detail" aria-hidden="true">
+        <button type="button" class="detail-close" id="detail-close">Close ×</button>
+        <span class="detail-kicker">Component</span>
+        <h2 class="detail-title" id="detail-title">Movement</h2>
+        <p class="detail-desc" id="detail-desc">
+          Circular-grained mainplate, mainspring barrel, and hand-finished wheel train holding timekeeping in alignment.
+        </p>
+      </aside>
+
+      <div class="bottom-left-copy">
+        <span class="micro-kicker">SCROLL TO UNFOLD</span>
+        <p class="copy-lead">Six assemblies</p>
+      </div>
+    </section>
+
+    <!-- 03 Mechanical Heart (Dark Mode) -->
+    <section class="overlay" data-overlay="Particles" aria-hidden="true">
+      <div class="heart-title">
+        <span class="heart-sub">Mechanical</span>
+        <h2 class="heart-main">Heart</h2>
+      </div>
+      <div class="bottom-left-copy heart-copy">
+        <p class="copy-lead">Hand-wound movement</p>
+        <p class="copy-muted">A column-wheel chronograph.<br />A balance of force and finesse.</p>
+      </div>
+      <div class="heart-metric">
+        <span class="metric-num">18'000</span>
+        <span class="metric-unit">VIBRATIONS PER HOUR</span>
+      </div>
+    </section>
+
+    <!-- 04 Presentation (3 Camera Stages) -->
+    <section class="overlay" data-overlay="Presentation" aria-hidden="true">
+      <div class="presentation-stage stage-0">
+        <div class="pres-heading-center">
+          <span class="micro-kicker">THE ART OF PRECISION</span>
+          <h2 class="pres-display">ELEGANT CONTOURS</h2>
+        </div>
+        <p class="bottom-left-copy pres-copy">
+          A stepped dial with the Dinesh signature, satin-brushed steel and polished bevels.
+        </p>
+        <div class="bottom-right-tag">DINESH — OPEN HEART</div>
+      </div>
+
+      <div class="presentation-stage stage-1">
+        <div class="pres-heading-left">
+          <h2 class="pres-stack">A<br />MECHANICAL<br />LEGACY</h2>
+          <p class="pres-left-copy">
+            A view through sapphire reveals the bridges, column wheel and hand-wound heart.
+          </p>
+        </div>
+        <div class="bottom-right-tag">CALIBRE 321 · SAPPHIRE</div>
+      </div>
+
+      <div class="presentation-stage stage-2">
+        <div class="pres-heading-center">
+          <span class="micro-kicker">THE ART OF PRECISION</span>
+          <h2 class="pres-display">IN YOUR HANDS</h2>
+        </div>
+        <p class="bottom-left-copy pres-copy">
+          The crown winds the calibre by hand. Two pushers control the chronograph.
+        </p>
+        <div class="bottom-right-tag">FLUTED CROWN &amp; PUSHERS</div>
+      </div>
+    </section>
+
+    <!-- 05 The Bracelet -->
+    <section class="overlay" data-overlay="Straps" aria-hidden="true">
+      <div class="bottom-left-copy">
+        <p class="copy-lead">The flat-link bracelet.</p>
+        <p class="copy-muted">Individual elements. A continuous line.</p>
+      </div>
+      <div class="bottom-right-specs">
+        <span>STAINLESS STEEL</span>
+        <span>19 MM AT THE LUGS</span>
+      </div>
+    </section>
+
+    <!-- 06 In Perspective (Dual Live 3D Viewports) -->
+    <section class="overlay" data-overlay="Images" aria-hidden="true">
+      <h2 class="perspective-title">In perspective.</h2>
+      <div class="editorial-grid">
+        <figure class="editorial-figure editorial-left">
+          <div class="editorial-viewport" id="editorial-one"></div>
+          <figcaption>
+            <span class="micro-kicker">01 / THE FACE</span>
+            <span class="cap-title">DINESH OPEN HEART</span>
+          </figcaption>
+        </figure>
+        <figure class="editorial-figure editorial-right">
+          <div class="editorial-viewport" id="editorial-two"></div>
+          <figcaption>
+            <span class="micro-kicker">02 / THE MOVEMENT</span>
+            <span class="cap-title">HAND-WOUND CHRONOGRAPH</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 07 Your Composition (Interactive Configurator) -->
+    <section class="overlay" data-overlay="Colors" aria-hidden="true">
+      <div class="configurator-panel" id="dinesh-configurator">
+        <span class="micro-kicker">DINESH OPEN HEART</span>
+        <h2 class="config-heading">Your composition.</h2>
+
+        <div class="config-group" role="radiogroup" aria-label="Dial finish">
+          <span class="group-label">Dial</span>
+          <div class="pill-row">
+            <button type="button" role="radio" aria-checked="true" data-group="dial" data-value="ink">
+              <span class="swatch swatch-ink"></span>Ink black
+            </button>
+            <button type="button" role="radio" aria-checked="false" data-group="dial" data-value="midnight">
+              <span class="swatch swatch-midnight"></span>Midnight blue
+            </button>
+            <button type="button" role="radio" aria-checked="false" data-group="dial" data-value="silver">
+              <span class="swatch swatch-silver"></span>Silver grey
+            </button>
+          </div>
+        </div>
+
+        <div class="config-group" role="radiogroup" aria-label="Hardware finish">
+          <span class="group-label">Hardware</span>
+          <div class="pill-row">
+            <button type="button" role="radio" aria-checked="true" data-group="hardware" data-value="silver">
+              <span class="swatch swatch-hw-silver"></span>Silver
+            </button>
+            <button type="button" role="radio" aria-checked="false" data-group="hardware" data-value="graphite">
+              <span class="swatch swatch-hw-graphite"></span>Graphite
+            </button>
+            <button type="button" role="radio" aria-checked="false" data-group="hardware" data-value="champagne">
+              <span class="swatch swatch-hw-champagne"></span>Champagne
+            </button>
+          </div>
+        </div>
+
+        <div class="config-group" role="radiogroup" aria-label="Steel bracelet">
+          <span class="group-label">Steel bracelet</span>
+          <div class="pill-row">
+            <button type="button" role="radio" aria-checked="true" data-group="bracelet" data-value="silver">
+              <span class="swatch swatch-br-silver"></span>Silver steel
+            </button>
+            <button type="button" role="radio" aria-checked="false" data-group="bracelet" data-value="dark">
+              <span class="swatch swatch-br-dark"></span>Dark steel
+            </button>
+          </div>
+        </div>
+
+        <output class="config-output" id="config-output">Ink black · Silver hardware · Silver steel</output>
+      </div>
+
+      <div class="bottom-right-copy">
+        <p class="copy-lead">A considered detail.</p>
+        <p class="copy-muted">A personal expression.</p>
+      </div>
+    </section>
+
+    <!-- 08 Coming Together (Reassembly) -->
+    <section class="overlay" data-overlay="Parts" aria-hidden="true">
+      <div class="parts-heading">
+        <span class="micro-kicker">COMING TOGETHER</span>
+        <h2 class="parts-display">Every part.<br />One watch.</h2>
+      </div>
+      <div class="bottom-left-copy">
+        <span class="micro-kicker" id="reassembly-stage-kicker">02 / THE MECHANICAL HEART</span>
+        <p class="copy-muted" id="reassembly-stage-desc">Bridges, bearings and wheels return to their place.</p>
+      </div>
+      <div class="reassembly-progress">
+        <span class="reassembly-pct" id="reassembly-pct">0%</span>
+        <div class="reassembly-meter">
+          <div class="reassembly-meter-fill" id="reassembly-meter-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 A Closer Look (4-Watch Finish Lineup & Footer) -->
+    <section class="overlay" data-overlay="Footer" aria-hidden="true">
+      <h2 class="footer-title">A closer look.</h2>
+
+      <div class="footer-lineup">
+        <button type="button" class="footer-slot" data-preset="ink-steel" aria-label="Select Ink steel as main watch">
+          <div class="footer-study" data-preset="ink-steel"></div>
+          <span class="study-btn">Ink steel</span>
+        </button>
+        <button type="button" class="footer-slot" data-preset="midnight" aria-label="Select Midnight as main watch">
+          <div class="footer-study" data-preset="midnight"></div>
+          <span class="study-btn">Midnight</span>
+        </button>
+        <button type="button" class="footer-slot" data-preset="silver-champagne" aria-label="Select Silver champagne as main watch">
+          <div class="footer-study" data-preset="silver-champagne"></div>
+          <span class="study-btn">Silver champagne</span>
+        </button>
+        <button type="button" class="footer-slot" data-preset="ink-champagne" aria-label="Select Ink champagne as main watch">
+          <div class="footer-study" data-preset="ink-champagne"></div>
+          <span class="study-btn">Ink champagne</span>
+        </button>
+      </div>
+
+      <footer class="footer-baseline">
+        <div class="footer-brand">
+          <svg class="footer-script" viewBox="0 0 462 146" aria-hidden="true">
+            <use href="#dinesh-script-mark" />
+          </svg>
+          <span>OPEN HEART</span>
+        </div>
+        <div class="footer-center">A STUDY IN PRECISION</div>
+        <button type="button" class="back-top-btn" id="back-to-top">Back to the beginning ↗</button>
+      </footer>
+    </section>
+
+    <!-- =====================================================================
+         SCROLL STORY SPACER TRACKS (Total height drives normalized scroll phase)
+         ===================================================================== -->
+    <main id="reference-story">
+      <section id="section-intro" data-webgl="Intro" style="height: 610vh"></section>
+      <section id="section-disassembly" data-webgl="Disassembly" style="height: 450vh"></section>
+      <section id="section-particles" data-webgl="Particles" style="height: 700vh"></section>
+      <section id="section-presentation" data-webgl="Presentation" style="height: 900vh"></section>
+      <section id="section-straps" data-webgl="Straps" style="height: 400vh"></section>
+      <section id="section-images" data-webgl="Images" style="height: 202vh"></section>
+      <section id="section-colors" data-webgl="Colors" style="height: 450vh"></section>
+      <section id="section-parts" data-webgl="Parts" style="height: 600vh"></section>
+      <section id="section-footer" data-webgl="Footer" style="height: 100vh"></section>
+      <div class="footer-spacer" style="height: 80vh"></div>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
